@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/MasonProtter/SpecializeVarargs.jl.svg?branch=master)](https://travis-ci.com/MasonProtter/SpecializeVarargs.jl)
+
 # SpecializeVarargs.jl
 
 SpecializeVarargs.jl does one thing: force to julia to create and specialize on a given number of varadic arguments. This is likely only useful to people doing very complicated codegen in high performance situations.
