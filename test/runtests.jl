@@ -12,5 +12,5 @@ end
 end
 
 @test f(1,2,3.0,4) == Tuple{Int64,Float64,Int64}
-@test length(methods(f))   == 5
-@test length(methods(goo)) == 4
+@test length(methods(f))   == 4
+@test length(methods(goo)) == 3
