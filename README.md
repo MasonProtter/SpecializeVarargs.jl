@@ -47,3 +47,24 @@ quote
             end)
 end
 ```
+
+You can also specify fallback code which is only run in the case where splatting occurs. You do this by including code like `fallback = ...` after the function definition
+```julia
+julia> @macroexpand1 @specialize_vararg 2 function h(args...) where T
+           *(args...)
+       end fallback = return false
+quote
+    function h(var"##arg1#492"::var"##T1#493"; ) where {T, var"##T1#493"}
+        args = (var"##arg1#492",)
+        #= REPL[19]:2 =#
+        (*)(args...)
+    end
+    function h(var"##495"::var"##T1#497", var"##496"::var"##T2#498", var"##args#494"...; ) where {T, var"##T1#497", var"##T2#498"}
+        args = (var"##495", var"##496", var"##args#494"...)
+        return false
+        #= REPL[19]:2 =#
+        (*)(args...)
+    end
+end
+```
+Notice that in the second method above, the function will just immediately exit and return `false`. 
