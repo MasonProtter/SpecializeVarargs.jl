@@ -9,14 +9,13 @@ macro specialize_vararg(n::Int, fdef::Expr)
 
     macros = Symbol[]
     while fdef.head == :macrocall && length(fdef.args) == 3
-        
         push!(macros, fdef.args[1])
         fdef = fdef.args[3]
     end
     
     d = splitdef(fdef)
     args = d[:args][end]
-    @assert d[:args][end] isa Expr && d[:args][end].head == Symbol("...") 
+    @assert d[:args][end] isa Expr && d[:args][end].head == Symbol("...") && d[:args][end].args[] isa Symbol  
     args_symbol = d[:args][end].args[]
 
     fdefs = Expr(:block)
