@@ -38,7 +38,6 @@ quote
             end)
     @foo @bar(function f(x::T, var"##526"::var"##T1#529", var"##527"::var"##T2#530", var"##528"::var"##T3#531", var"##args#525"...; ) where {T, var"##T1#529", var"##T2#530", var"##T3#531"}
                 args = (var"##526", var"##527", var"##528", var"##args#525"...)
-                #= REPL[5]:2 =#
                 typeof(args)
             end)
 end
