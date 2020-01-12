@@ -2,7 +2,8 @@ module SpecializeVarargs
 
 export @specialize_vararg
 
-using MacroTools: MacroTools, splitdef, combinedef
+#using MacroTools: MacroTools, splitdef, combinedef
+using Mocking: Mocking, splitdef, combinedef
 
 macro specialize_vararg(n::Int, fdef::Expr, fallback=false)
     @assert n > 0
@@ -14,7 +15,11 @@ macro specialize_vararg(n::Int, fdef::Expr, fallback=false)
     end
     
     d = splitdef(fdef)
-    args = d[:args][end]
+
+    get!(d, :whereparams, Any[])
+    get!(d, :body,        Expr(:block))
+    get!(d, :args,        Any[])
+    
     @assert d[:args][end] isa Expr && d[:args][end].head == Symbol("...")
     if d[:args][end].args[] isa Symbol
         args_symbol = d[:args][end].args[]

@@ -15,9 +15,7 @@ end
 @test length(methods(f))   == 4
 @test length(methods(goo)) == 3
 
-
-
-@specialize_vararg 4 @inline(function h(args...) where T
+@specialize_vararg 4 @inline(function h(args...)
     *(args...)
 end) fallback = return false
 
