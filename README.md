@@ -17,7 +17,6 @@ quote
     end
     function f(x, var"##624"::var"##T1#627", var"##625"::var"##T2#628", var"##626"::var"##T3#629", var"##args#623"...; ) where {var"##T1#627", var"##T2#628", var"##T3#629"}
         my_varargs = (var"##624", var"##625", var"##626", var"##args#623"...)
-        #= REPL[17]:1 =#
         length(my_varargs)
     end
 end
