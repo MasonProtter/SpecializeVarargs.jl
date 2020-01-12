@@ -3,23 +3,21 @@
 SpecializeVarargs.jl does one thing: force to julia to create and specialize on a given number of varadic arguments. This is likely only useful to people doing very complicated codegen in high performance situations.
 
 ```julia
-julia> using SpecializeVarargs
-
 julia> @macroexpand @specialize_vararg 3 f(x, my_varargs...) = length(my_varargs)
 quote
-    function f(x, var"##arg1#457"::var"##T1#458"; ) where var"##T1#458"
-        my_varargs = (Symbol("##arg1#457"),)
-        #= REPL[32]:1 =#
+    function f(x, var"##arg1#617"::var"##T1#618"; ) where var"##T1#618"
+        my_varargs = (var"##arg1#617",)
+        #= REPL[17]:1 =#
         length(my_varargs)
     end
-    function f(x, var"##arg1#459"::var"##T1#461", var"##arg2#460"::var"##T2#462"; ) where {var"##T1#461", var"##T2#462"}
-        my_varargs = (Symbol("##arg1#459"), Symbol("##arg2#460"))
-        #= REPL[32]:1 =#
+    function f(x, var"##arg1#619"::var"##T1#621", var"##arg2#620"::var"##T2#622"; ) where {var"##T1#621", var"##T2#622"}
+        my_varargs = (var"##arg1#619", var"##arg2#620")
+        #= REPL[17]:1 =#
         length(my_varargs)
     end
-    function f(x, var"##464"::var"##T1#467", var"##465"::var"##T2#468", var"##466"::var"##T3#469", var"##args#463"...; ) where {var"##T1#467", var"##T2#468", var"##T3#469"}
-        my_varargs = (var"##464", var"##465", var"##466", var"##args#463"...)
-        #= REPL[32]:1 =#
+    function f(x, var"##624"::var"##T1#627", var"##625"::var"##T2#628", var"##626"::var"##T3#629", var"##args#623"...; ) where {var"##T1#627", var"##T2#628", var"##T3#629"}
+        my_varargs = (var"##624", var"##625", var"##626", var"##args#623"...)
+        #= REPL[17]:1 =#
         length(my_varargs)
     end
 end
