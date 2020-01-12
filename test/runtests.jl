@@ -14,3 +14,13 @@ end
 @test f(1,2,3.0,4) == Tuple{Int64,Float64,Int64}
 @test length(methods(f))   == 4
 @test length(methods(goo)) == 3
+
+
+
+@specialize_vararg 4 @inline(function h(args...) where T
+    *(args...)
+end) fallback = return false
+
+@test h(1,2,3.0)          == 6.0
+@test length(methods(f))  == 4
+@test h(1,2,3,4,5)        == false

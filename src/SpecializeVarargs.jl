@@ -4,7 +4,7 @@ export @specialize_vararg
 
 using MacroTools: MacroTools, splitdef, combinedef, @capture
 
-macro specialize_vararg(n::Int, fdef::Expr)
+macro specialize_vararg(n::Int, fdef::Expr, fallback=false)
     @assert n > 0
 
     macros = Symbol[]
@@ -47,6 +47,10 @@ macro specialize_vararg(n::Int, fdef::Expr)
     di[:whereparams] = (di[:whereparams]..., Ts...)
 
     push!(di[:args], args_with_Ts...)
+    if fallback != false
+        @assert fallback isa Expr && fallback.head == :(=) && fallback.args[1] == :fallback
+        pushfirst!(di[:body].args, fallback.args[2])
+    end
     pushfirst!(di[:body].args, :($args_symbol = $(Expr(:tuple, args...))))
 
     cfdef = combinedef(di)
