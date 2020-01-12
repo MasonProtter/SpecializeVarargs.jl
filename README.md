@@ -1,6 +1,6 @@
 # SpecializeVarargs.jl
 
-SpecializeVarargs.jl does one thing: force to julia to create and specialize on a given number of varadic arguments:
+SpecializeVarargs.jl does one thing: force to julia to create and specialize on a given number of varadic arguments. This is likely only useful to people doing very complicated codegen in high performance situations.
 
 ```julia
 julia> using SpecializeVarargs
