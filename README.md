@@ -2,7 +2,7 @@
 
 # SpecializeVarargs.jl
 
-SpecializeVarargs.jl does one thing: force to julia to create and specialize on a given number of varadic arguments. This is likely only useful to people doing very complicated codegen in high performance situations.
+SpecializeVarargs.jl does one thing: force to julia to create and specialize on a given number of varadic arguments. This is likely only useful to people doing very complicated codegen in high performance situations, e.g. in Cassette overdub methods like those used in [ForwardDiff2.jl](https://github.com/YingboMa/ForwardDiff2.jl). 
 
 ```julia
 julia> using SpecializeVarargs
@@ -19,12 +19,12 @@ quote
     end
     function f(x, var"##arg1#409"::var"##T1#412", var"##arg2#410"::var"##T2#413", var"##arg3#411"::var"##T3#414", var"##args#408"...; ) where {var"##T1#412", var"##T2#413", var"##T3#414"}
         my_varargs = (var"##arg1#409", var"##arg2#410", var"##arg3#411", var"##args#408"...)
-        #= REPL[2]:1 =#
         length(my_varargs)
     end
 end
 
 ```
+### Nested macros
 SpecializeVarargs can handle functions defined with macros in front of them as well (e.g. `@inbounds`), and will forward those macros to the created methods:
 ```julia
 julia> @macroexpand1 @specialize_vararg 3 @foo @bar function f(x::T, args...) where T
@@ -46,7 +46,7 @@ quote
             end)
 end
 ```
-
+### Fallback code
 You can specify fallback code which is only run in the case where splatting occurs. You do this by including code like `fallback = ...` after the function definition
 ```julia
 julia> @macroexpand1 @specialize_vararg 2 function h(args...)
@@ -66,6 +66,7 @@ end
 ```
 Notice that in the second method above, the function will just immediately exit and return `false`. 
 
+### Vararg type constraints
 The `@specialize_vararg` macro also supports adding type constraints to the varargs:
 ```julia
 julia> @macroexpand1 @specialize_vararg 3 function g(args::T...) where {T<:Int}
