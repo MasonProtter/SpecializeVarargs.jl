@@ -2,7 +2,7 @@ module SpecializeVarargs
 
 export @specialize_vararg
 
-using MacroTools: MacroTools, splitdef, combinedef, @capture
+using MacroTools: MacroTools, splitdef, combinedef
 
 macro specialize_vararg(n::Int, fdef::Expr, fallback=false)
     @assert n > 0
@@ -15,8 +15,16 @@ macro specialize_vararg(n::Int, fdef::Expr, fallback=false)
     
     d = splitdef(fdef)
     args = d[:args][end]
-    @assert d[:args][end] isa Expr && d[:args][end].head == Symbol("...") && d[:args][end].args[] isa Symbol  
-    args_symbol = d[:args][end].args[]
+    @assert d[:args][end] isa Expr && d[:args][end].head == Symbol("...")
+    if d[:args][end].args[] isa Symbol
+        args_symbol = d[:args][end].args[]
+        args_constr = :Any
+    elseif d[:args][end].args[] isa Expr && d[:args][end].args[].head == :(::)
+        args_symbol = d[:args][end].args[].args[1]
+        args_constr = d[:args][end].args[].args[2]
+    else
+        error("Malformed vararg expression $(d[:args][end].args[])")
+    end
 
     fdefs = Expr(:block)
 
@@ -24,11 +32,12 @@ macro specialize_vararg(n::Int, fdef::Expr, fallback=false)
         di = deepcopy(d)
         pop!(di[:args])
         args = Tuple(gensym("arg$j") for j in 1:i)
-        Ts   = Tuple(gensym("T$j")   for j in 1:i)
-
-        args_with_Ts = ((arg, T) -> :($arg :: $T)).(args, Ts)
+        Ts   = Tuple(gensym("T$j"  ) for j in 1:i)
         
-        di[:whereparams] = (di[:whereparams]..., Ts...)
+        args_with_Ts   = ((arg, T) -> :($arg :: $T)).(args, Ts)
+        Ts_with_constr = (T -> :($T <: $args_constr)).(Ts)
+        
+        di[:whereparams] = (di[:whereparams]..., Ts_with_constr...)
 
         push!(di[:args], args_with_Ts...)
         pushfirst!(di[:body].args, :($args_symbol = $(Expr(:tuple, args...))))
@@ -39,12 +48,14 @@ macro specialize_vararg(n::Int, fdef::Expr, fallback=false)
 
     di = deepcopy(d)
     pop!(di[:args])
-    args = tuple((gensym() for j in 1:n)..., :($(gensym("args"))...))
+    args = tuple((gensym("arg$j") for j in 1:n)..., :($(gensym("args"))...))
     Ts   = Tuple(gensym("T$j")   for j in 1:n)
 
-    args_with_Ts = (((arg, T) -> :($arg :: $T)).(args[1:end-1], Ts)..., args[end])
+    args_with_Ts = (((arg, T) -> :($arg :: $T)).(args[1:end-1], Ts)..., :($(args[end].args[1])::$args_constr...))
+    Ts_with_constr = (T -> :($T <: $args_constr)).(Ts)
+        
+    di[:whereparams] = (di[:whereparams]..., Ts_with_constr...)
     
-    di[:whereparams] = (di[:whereparams]..., Ts...)
 
     push!(di[:args], args_with_Ts...)
     if fallback != false

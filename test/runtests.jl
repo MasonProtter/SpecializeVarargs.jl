@@ -24,3 +24,10 @@ end) fallback = return false
 @test h(1,2,3.0)          == 6.0
 @test length(methods(f))  == 4
 @test h(1,2,3,4,5)        == false
+
+
+@specialize_vararg 3 function g(args::T...) where {T<:Int}
+    *(args...)
+end
+@test g(1,2)         == 2
+@test g(1,2,3,4,5,6) == 720
