@@ -33,7 +33,6 @@ julia> @macroexpand1 @specialize_vararg 3 @foo @bar function f(x::T, args...) wh
 quote
     @foo @bar(function f(x::T, var"##arg1#415"::var"##T1#416"; ) where {T, var"##T1#416"}
                 args = (var"##arg1#415",)
-                #= REPL[3]:2 =#
                 typeof(args)
             end)
     @foo @bar(function f(x::T, var"##arg1#417"::var"##T1#419", var"##arg2#418"::var"##T2#420"; ) where {T, var"##T1#419", var"##T2#420"}
