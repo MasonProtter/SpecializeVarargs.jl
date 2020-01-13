@@ -23,7 +23,7 @@ mutable struct Trace
     Trace() = new(Any[], Any[])
 end
 
-@specialize_vararg 5 function enter!(t::Trace, args...)
+function enter!(t::Trace, args...)
     pair = args => Any[]
     push!(t.current, pair)
     push!(t.stack, t.current)
@@ -47,7 +47,7 @@ julia> @btime Cassette.overdub(TraceCtx(metadata = trace), () -> f(x, y, z))
   3.315 μs (41 allocations: 1.48 KiB)
 0.2360528466104866
 ```
-Now let's redefine the `enter!` function using SpecializeVarargs:
+Now let's redefine the `enter!` function using SpecializeVarargs's macro `@specialize_vararg`:
 ```julia
 julia> @specialize_vararg 5 function enter!(t::Trace, args...)
            pair = args => Any[]
