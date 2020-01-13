@@ -2,7 +2,6 @@ module SpecializeVarargs
 
 export @specialize_vararg
 
-#using MacroTools: MacroTools, splitdef, combinedef
 using Mocking: Mocking, splitdef, combinedef
 
 macro specialize_vararg(n::Int, fdef::Expr, fallback=false)

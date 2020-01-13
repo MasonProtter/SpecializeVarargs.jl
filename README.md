@@ -4,6 +4,66 @@
 
 SpecializeVarargs.jl does one thing: force to julia to create and specialize on a given number of varadic arguments. This is likely only useful to people doing very complicated codegen in high performance situations, e.g. in Cassette overdub methods like those used in [ForwardDiff2.jl](https://github.com/YingboMa/ForwardDiff2.jl). 
 
+Here's a [Cassette.jl](https://github.com/jrevels/Cassette.jl) example where SpecializeVarargs.jl can give a performance boost:
+```julia
+using SpecializeVarargs
+using Cassette
+
+Cassette.@context TraceCtx
+
+mutable struct Trace
+    current::Vector{Any}
+    stack::Vector{Any}
+    Trace() = new(Any[], Any[])
+end
+
+@specialize_vararg 5 function enter!(t::Trace, args...)
+    pair = args => Any[]
+    push!(t.current, pair)
+    push!(t.stack, t.current)
+    t.current = pair.second
+    return nothing
+end
+
+function exit!(t::Trace)
+    t.current = pop!(t.stack)
+    return nothing
+end
+
+Cassette.prehook(ctx::TraceCtx, args...) = enter!(ctx.metadata, args...)
+Cassette.posthook(ctx::TraceCtx, args...) = exit!(ctx.metadata)
+
+trace = Trace()
+x, y, z = rand(3)
+f(x, y, z) = x*y + y*z
+
+julia> @btime Cassette.overdub(TraceCtx(metadata = trace), () -> f(x, y, z))
+  3.315 μs (41 allocations: 1.48 KiB)
+0.2360528466104866
+```
+Now let's redefine the `enter!` function using SpecializeVarargs:
+```julia
+julia> @specialize_vararg 5 function enter!(t::Trace, args...)
+           pair = args => Any[]
+           push!(t.current, pair)
+           push!(t.stack, t.current)
+           t.current = pair.second
+           return nothing
+       end
+enter! (generic function with 6 methods)
+
+julia> @btime Cassette.overdub(TraceCtx(metadata = trace), () -> f(x, y, z))
+  1.540 μs (27 allocations: 1.17 KiB)
+0.2360528466104866
+```
+Nice!
+
+### What is the macro doing?
+<details>
+ <summaryClick me! ></summary>
+<p>
+
+The macro `@specialize_vararg`, called like `@specialize_vararg N fdef` where `N` is an integer literal and `fdef` is a varadic function definition, will create literal methods for the function defined in `fdef` for up to `N` arguments before falling back on a traditional vararg definition. We can exapand the macro to see what exaclt it's doing:
 ```julia
 julia> using SpecializeVarargs
 
@@ -22,9 +82,13 @@ quote
         length(my_varargs)
     end
 end
-
 ```
+</p>
+</details>
 ### Nested macros
+<details>
+ <summaryClick me! ></summary>
+<p>
 SpecializeVarargs can handle functions defined with macros in front of them as well (e.g. `@inbounds`), and will forward those macros to the created methods:
 ```julia
 julia> @macroexpand1 @specialize_vararg 3 @foo @bar function f(x::T, args...) where T
@@ -45,7 +109,12 @@ quote
             end)
 end
 ```
+</p>
+</details>
 ### Fallback code
+<details>
+ <summaryClick me! ></summary>
+<p>
 You can specify fallback code which is only run in the case where splatting occurs. You do this by including code like `fallback = ...` after the function definition
 ```julia
 julia> @macroexpand1 @specialize_vararg 2 function h(args...)
@@ -64,8 +133,12 @@ quote
 end
 ```
 Notice that in the second method above, the function will just immediately exit and return `false`. 
-
+</p>
+</details>
 ### Vararg type constraints
+<details>
+ <summaryClick me! ></summary>
+<p>
 The `@specialize_vararg` macro also supports adding type constraints to the varargs:
 ```julia
 julia> @macroexpand1 @specialize_vararg 3 function g(args::T...) where {T<:Int}
@@ -86,3 +159,5 @@ quote
     end
 end
 ```
+</p>
+</details>
