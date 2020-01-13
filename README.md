@@ -152,6 +152,19 @@ end
 ```
 Notice that in the second method above, the function will just immediately exit and return `false`. 
 
+It should also be noted that if you're applying a macro to your function definition and you want a fallback method, you need to enclose the macro with parentheses because, for example, 
+```julia
+@specialize_vararg 3 @inline f(x...) = sum(x) fallback = ("hi")
+```
+will be parsed as
+```julia
+@specialize_vararg(3, @inline(f(x...) = sum(x), fallback = ("hi")))
+```
+instead of the desired
+```julia
+@specialize_vararg(3, @inline(f(x...) = sum(x)), fallback = ("hi"))
+```
+
 </p>
 </details>
 
