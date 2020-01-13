@@ -4,7 +4,13 @@
 
 SpecializeVarargs.jl does one thing: force to julia to create and specialize on a given number of varadic arguments. This is likely only useful to people doing very complicated codegen in high performance situations, e.g. in Cassette overdub methods like those used in [ForwardDiff2.jl](https://github.com/YingboMa/ForwardDiff2.jl). 
 
-Here's a [Cassette.jl](https://github.com/jrevels/Cassette.jl) example where SpecializeVarargs.jl can give a performance boost:
+### Performance Example
+
+<details>
+ <summaryClick me! ></summary>
+<p>
+
+Here's a [Cassette.jl](https://github.com/jrevels/Cassette.jl) example from the manual on [contextual dispatch](https://jrevels.github.io/Cassette.jl/stable/contextualdispatch.html) where SpecializeVarargs.jl can give a performance boost:
 ```julia
 using SpecializeVarargs
 using Cassette
@@ -57,6 +63,9 @@ julia> @btime Cassette.overdub(TraceCtx(metadata = trace), () -> f(x, y, z))
 0.2360528466104866
 ```
 Nice!
+
+</p>
+</details>
 
 ### What is the macro doing?
 
