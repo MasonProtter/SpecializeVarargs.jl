@@ -59,6 +59,7 @@ julia> @btime Cassette.overdub(TraceCtx(metadata = trace), () -> f(x, y, z))
 Nice!
 
 ### What is the macro doing?
+
 <details>
  <summaryClick me! ></summary>
 <p>
@@ -83,12 +84,16 @@ quote
     end
 end
 ```
+
 </p>
 </details>
+
 ### Nested macros
+
 <details>
  <summaryClick me! ></summary>
 <p>
+
 SpecializeVarargs can handle functions defined with macros in front of them as well (e.g. `@inbounds`), and will forward those macros to the created methods:
 ```julia
 julia> @macroexpand1 @specialize_vararg 3 @foo @bar function f(x::T, args...) where T
@@ -109,12 +114,16 @@ quote
             end)
 end
 ```
+
 </p>
 </details>
+
 ### Fallback code
+
 <details>
  <summaryClick me! ></summary>
 <p>
+
 You can specify fallback code which is only run in the case where splatting occurs. You do this by including code like `fallback = ...` after the function definition
 ```julia
 julia> @macroexpand1 @specialize_vararg 2 function h(args...)
@@ -133,12 +142,16 @@ quote
 end
 ```
 Notice that in the second method above, the function will just immediately exit and return `false`. 
+
 </p>
 </details>
+
 ### Vararg type constraints
+
 <details>
  <summaryClick me! ></summary>
 <p>
+
 The `@specialize_vararg` macro also supports adding type constraints to the varargs:
 ```julia
 julia> @macroexpand1 @specialize_vararg 3 function g(args::T...) where {T<:Int}
@@ -159,5 +172,6 @@ quote
     end
 end
 ```
+
 </p>
 </details>
