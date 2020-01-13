@@ -73,7 +73,7 @@ Nice!
  <summaryClick me! ></summary>
 <p>
 
-The macro `@specialize_vararg`, called like `@specialize_vararg N fdef` where `N` is an integer literal and `fdef` is a varadic function definition, will create literal methods for the function defined in `fdef` for up to `N` arguments before falling back on a traditional vararg definition. We can exapand the macro to see what exaclt it's doing:
+The macro `@specialize_vararg`, called like `@specialize_vararg N fdef` where `N` is an integer literal and `fdef` is a varadic function definition, will create literal methods for the function defined in `fdef` for up to `N` arguments before falling back on a traditional vararg definition. We can exapand the macro to see what exactly it's doing:
 ```julia
 julia> using SpecializeVarargs
 
