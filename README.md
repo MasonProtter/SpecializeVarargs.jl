@@ -4,6 +4,16 @@
 
 SpecializeVarargs.jl does one thing: force to julia to create and specialize on a given number of varadic arguments. This is likely only useful to people doing very complicated codegen in high performance situations, e.g. in Cassette overdub methods like those used in [ForwardDiff2.jl](https://github.com/YingboMa/ForwardDiff2.jl). 
 
+To install, simply open the `pkg` repl mode with `]` from the regular julia REPL and type
+```julia
+pkg> add SpecializeVarargs
+```
+or do 
+```julia
+julia> using Pkg; pkg"add SpecializeVarargs"
+```
+from the julia repl.
+
 ### Performance Example
 
 <details>
