@@ -2,7 +2,7 @@ module SpecializeVarargs
 
 export @specialize_vararg
 
-using Mocking: Mocking, splitdef, combinedef
+using ExprTools: splitdef, combinedef
 
 macro specialize_vararg(n::Int, fdef::Expr, fallback=false)
     @assert n > 0
