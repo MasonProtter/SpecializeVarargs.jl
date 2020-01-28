@@ -2,7 +2,7 @@ module SpecializeVarargs
 
 export @specialize_vararg
 
-using Mocking: Mocking, splitdef, combinedef
+using ExprTools: splitdef, combinedef
 
 macro specialize_vararg(n::Int, fdef::Expr, fallback=false)
     @assert n > 0
@@ -12,13 +12,13 @@ macro specialize_vararg(n::Int, fdef::Expr, fallback=false)
         push!(macros, fdef.args[1])
         fdef = fdef.args[3]
     end
-    
+
     d = splitdef(fdef)
 
     get!(d, :whereparams, Any[])
     get!(d, :body,        Expr(:block))
     get!(d, :args,        Any[])
-    
+
     @assert d[:args][end] isa Expr && d[:args][end].head == Symbol("...")
     if d[:args][end].args[] isa Symbol
         args_symbol = d[:args][end].args[]
@@ -37,10 +37,10 @@ macro specialize_vararg(n::Int, fdef::Expr, fallback=false)
         pop!(di[:args])
         args = Tuple(gensym("arg$j") for j in 1:i)
         Ts   = Tuple(gensym("T$j"  ) for j in 1:i)
-        
+
         args_with_Ts   = ((arg, T) -> :($arg :: $T)).(args, Ts)
         Ts_with_constr = (T -> :($T <: $args_constr)).(Ts)
-        
+
         di[:whereparams] = (di[:whereparams]..., Ts_with_constr...)
 
         push!(di[:args], args_with_Ts...)
@@ -57,9 +57,9 @@ macro specialize_vararg(n::Int, fdef::Expr, fallback=false)
 
     args_with_Ts = (((arg, T) -> :($arg :: $T)).(args[1:end-1], Ts)..., :($(args[end].args[1])::$args_constr...))
     Ts_with_constr = (T -> :($T <: $args_constr)).(Ts)
-        
+
     di[:whereparams] = (di[:whereparams]..., Ts_with_constr...)
-    
+
 
     push!(di[:args], args_with_Ts...)
     if fallback != false
